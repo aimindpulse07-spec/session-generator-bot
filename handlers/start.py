@@ -2,6 +2,8 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
+from keyboards.main import main_menu
+
 router = Router()
 
 
@@ -20,4 +22,7 @@ async def start_handler(message: Message) -> None:
         "Use /help to see available commands."
     )
 
-    await message.answer(text)
+    await message.answer(
+        text,
+        reply_markup=main_menu(),
+    )
