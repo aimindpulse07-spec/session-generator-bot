@@ -1,5 +1,6 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.filters import Command
+from aiogram.types import CallbackQuery, Message
 
 from keyboards.generator import auth_method_menu, library_menu
 from utils.session_state import session_states
@@ -13,27 +14,37 @@ GENERATOR_TEXT = """
 Select which library you want to use:
 
 📱 <b>Pyrogram</b>
-Generate a Pyrogram-compatible session.
+Choose Pyrogram to continue.
 
 📡 <b>Telethon</b>
-Generate a Telethon-compatible session.
+Choose Telethon to continue.
+
+⚠️ Authentication credentials are never stored
+by this bot.
 """
 
 
 AUTH_TEXT = """
 🔐 <b>Choose Authentication Method</b>
 
-Select how you want to authenticate:
+Select an authentication method:
 
 🔢 <b>OTP</b>
-Authenticate using Telegram's login code.
+Use Telegram's login-code flow.
 
 📷 <b>QR Code</b>
-Authenticate using a Telegram QR code.
+Use Telegram's QR-based flow.
 
-⚠️ Never share your OTP, 2FA password,
-or generated session with anyone.
+⚠️ Never share your OTP or 2FA password.
 """
+
+
+@router.message(Command("gen"))
+async def generate_command(message: Message) -> None:
+    await message.answer(
+        GENERATOR_TEXT,
+        reply_markup=library_menu(),
+    )
 
 
 @router.callback_query(F.data == "generate")
@@ -49,15 +60,18 @@ async def generate_callback(callback: CallbackQuery) -> None:
     F.data.in_({"library_pyrogram", "library_telethon"})
 )
 async def library_callback(callback: CallbackQuery) -> None:
+    if callback.from_user is None:
+        await callback.answer(
+            "Unable to identify user.",
+            show_alert=True,
+        )
+        return
+
     library = (
         "pyrogram"
         if callback.data == "library_pyrogram"
         else "telethon"
     )
-
-    if callback.from_user is None:
-        await callback.answer("Unable to identify user.", show_alert=True)
-        return
 
     await session_states.create(
         user_id=callback.from_user.id,
@@ -73,24 +87,44 @@ async def library_callback(callback: CallbackQuery) -> None:
 
 
 @router.callback_query(F.data.startswith("auth_"))
-async def auth_method_callback(callback: CallbackQuery) -> None:
+async def auth_method_callback(
+    callback: CallbackQuery,
+) -> None:
     if callback.from_user is None:
-        await callback.answer("Unable to identify user.", show_alert=True)
+        await callback.answer(
+            "Unable to identify user.",
+            show_alert=True,
+        )
         return
 
     data = callback.data or ""
 
     if ":" not in data:
-        await callback.answer("Invalid authentication method.", show_alert=True)
+        await callback.answer(
+            "Invalid authentication method.",
+            show_alert=True,
+        )
         return
 
     method, library = data.split(":", 1)
 
     if method not in {"auth_otp", "auth_qr"}:
-        await callback.answer("Invalid authentication method.", show_alert=True)
+        await callback.answer(
+            "Invalid authentication method.",
+            show_alert=True,
+        )
         return
 
-    state = await session_states.get(callback.from_user.id)
+    if library not in {"pyrogram", "telethon"}:
+        await callback.answer(
+            "Invalid library.",
+            show_alert=True,
+        )
+        return
+
+    state = await session_states.get(
+        callback.from_user.id
+    )
 
     if state is None or state.library != library:
         await callback.answer(
@@ -99,30 +133,50 @@ async def auth_method_callback(callback: CallbackQuery) -> None:
         )
         return
 
-    state.method = "otp" if method == "auth_otp" else "qr"
-
-    await callback.answer(
-        f"{state.method.upper()} selected."
+    state.method = (
+        "otp"
+        if method == "auth_otp"
+        else "qr"
     )
 
-    # Actual authentication will be implemented separately.
     await callback.message.edit_text(
         f"""
 ✅ <b>{library.title()}</b> selected.
 
-🔐 Authentication method:
-<b>{state.method.upper()}</b>
+🔐 Method: <b>{state.method.upper()}</b>
 
-The secure authentication flow will be connected
-in the next step.
+The authentication flow is not connected yet.
+
+Your temporary selection will automatically expire.
 """,
     )
+
+    await callback.answer()
 
 
 @router.callback_query(F.data == "close")
 async def close_callback(callback: CallbackQuery) -> None:
     if callback.from_user is not None:
-        await session_states.delete(callback.from_user.id)
+        await session_states.delete(
+            callback.from_user.id
+        )
 
     await callback.message.delete()
+    await callback.answer()
+
+
+@router.callback_query(F.data == "generate_back")
+async def generate_back_callback(
+    callback: CallbackQuery,
+) -> None:
+    if callback.from_user is not None:
+        await session_states.delete(
+            callback.from_user.id
+        )
+
+    await callback.message.edit_text(
+        GENERATOR_TEXT,
+        reply_markup=library_menu(),
+    )
+
     await callback.answer()
