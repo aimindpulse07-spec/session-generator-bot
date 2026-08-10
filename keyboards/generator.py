@@ -40,7 +40,7 @@ def auth_method_menu(library: str) -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton(
                     text="⬅️ Back",
-                    callback_data="generate",
+                    callback_data="generate_back",
                 ),
                 InlineKeyboardButton(
                     text="✖️ Close",
