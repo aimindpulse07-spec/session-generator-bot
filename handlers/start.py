@@ -9,16 +9,14 @@ router = Router()
 
 
 WELCOME_TEXT = """
-<b>👋 Welcome to Session Generator Bot!</b>
+👋 <b>Welcome!</b>
 
-🔐 Generate Telegram sessions through
-a simple and secure interface.
+🤖 <b>Session Generator Bot</b>
 
-⚡ Fast
-🛡️ Privacy-focused
-📱 Pyrogram & Telethon support
+Use the buttons below to explore the bot.
 
-Choose an option below.
+⚠️ Never share your Telegram OTP,
+2FA password, or authentication credentials.
 """
 
 
