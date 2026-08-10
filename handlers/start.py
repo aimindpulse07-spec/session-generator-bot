@@ -7,22 +7,23 @@ from keyboards.main import main_menu
 router = Router()
 
 
+WELCOME_TEXT = """
+<b>👋 Welcome to Session Generator Bot!</b>
+
+🔐 Generate Telegram sessions through
+a simple and secure interface.
+
+⚡ Fast
+🛡️ Privacy-focused
+📱 Pyrogram & Telethon support
+
+Choose an option below.
+"""
+
+
 @router.message(CommandStart())
 async def start_handler(message: Message) -> None:
-    name = (
-        message.from_user.first_name
-        if message.from_user
-        else "User"
-    )
-
-    text = (
-        f"👋 <b>Welcome, {name}!</b>\n\n"
-        "🔐 <b>Session Generator Bot</b>\n\n"
-        "Your secure Telegram utility bot.\n\n"
-        "Use /help to see available commands."
-    )
-
     await message.answer(
-        text,
+        WELCOME_TEXT,
         reply_markup=main_menu(),
     )
