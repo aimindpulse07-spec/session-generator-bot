@@ -6,6 +6,44 @@ from keyboards.generator import auth_method_menu, library_menu
 from utils.session_state import session_states
 
 router = Router()
+@router.message(Command("genp"))
+async def generate_pyrogram_command(message: Message) -> None:
+    if message.from_user is None:
+        return
+
+    await session_states.create(
+        user_id=message.from_user.id,
+        library="pyrogram",
+    )
+
+    await message.answer(
+        """
+📱 <b>Pyrogram Selected</b>
+
+Choose an authentication method:
+""",
+        reply_markup=auth_method_menu("pyrogram"),
+    )
+
+
+@router.message(Command("gent"))
+async def generate_telethon_command(message: Message) -> None:
+    if message.from_user is None:
+        return
+
+    await session_states.create(
+        user_id=message.from_user.id,
+        library="telethon",
+    )
+
+    await message.answer(
+        """
+📡 <b>Telethon Selected</b>
+
+Choose an authentication method:
+""",
+        reply_markup=auth_method_menu("telethon"),
+    )
 
 
 GENERATOR_TEXT = """
