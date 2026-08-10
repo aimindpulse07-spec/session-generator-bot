@@ -10,6 +10,8 @@ from handlers.start import router as start_router
 from handlers.help import router as help_router
 from handlers.generator import router as generator_router
 from handlers.account import router as account_router
+from handlers.stats import router as stats_router
+
 
 async def main() -> None:
     validate_config()
@@ -28,6 +30,7 @@ async def main() -> None:
     dp.include_router(help_router)
     dp.include_router(generator_router)
     dp.include_router(account_router)
+    dp.include_router(stats_router)
 
     logging.info("Starting bot...")
 
