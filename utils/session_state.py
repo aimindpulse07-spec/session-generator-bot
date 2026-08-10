@@ -51,9 +51,34 @@ class SessionStateManager:
         async with self._lock:
             self._states.pop(user_id, None)
 
+    async def cleanup_expired(self) -> None:
+        now = monotonic()
+
+        async with self._lock:
+            expired_users = [
+                user_id
+                for user_id, state in self._states.items()
+                if now - state.created_at > self._timeout
+            ]
+
+            for user_id in expired_users:
+                self._states.pop(user_id, None)
+
+    async def cleanup_loop(self, interval: int = 60) -> None:
+        while True:
+            try:
+                await self.cleanup_expired()
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                # Cleanup failure must not stop the bot.
+                pass
+
+            await asyncio.sleep(interval)
+
     async def clear_all(self) -> None:
         async with self._lock:
             self._states.clear()
 
 
-session_states = SessionStateManager()
+session_states = SessionStateManager(timeout=600)
