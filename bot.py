@@ -7,6 +7,8 @@ from aiogram.enums import ParseMode
 
 from config import BOT_TOKEN, validate_config
 from handlers.start import router as start_router
+from handlers.help import router as help_router
+
 
 async def main() -> None:
     validate_config()
@@ -19,8 +21,10 @@ async def main() -> None:
     )
 
     dp = Dispatcher()
-    
+
+    # Register bot handlers
     dp.include_router(start_router)
+    dp.include_router(help_router)
 
     logging.info("Starting bot...")
 
