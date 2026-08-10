@@ -11,10 +11,11 @@ from handlers.help import router as help_router
 from handlers.generator import router as generator_router
 from handlers.account import router as account_router
 from handlers.stats import router as stats_router
-
+from utils.database import init_database
 
 async def main() -> None:
     validate_config()
+    init_database()
 
     bot = Bot(
         token=BOT_TOKEN,
