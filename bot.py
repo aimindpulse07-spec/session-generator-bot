@@ -6,7 +6,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from config import BOT_TOKEN, validate_config
-
+from handlers.start import router as start_router
 
 async def main() -> None:
     validate_config()
