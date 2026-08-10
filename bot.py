@@ -19,6 +19,8 @@ async def main() -> None:
     )
 
     dp = Dispatcher()
+    
+    dp.include_router(start_router)
 
     logging.info("Starting bot...")
 
