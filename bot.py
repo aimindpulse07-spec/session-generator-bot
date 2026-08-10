@@ -11,6 +11,7 @@ from handlers.help import router as help_router
 from handlers.start import router as start_router
 from handlers.stats import router as stats_router
 from utils.database import init_database
+from utils.errors import router as error_router
 from utils.logger import logger, setup_logging
 from utils.session_state import session_states
 
@@ -37,6 +38,8 @@ async def main() -> None:
     dp.include_router(generator_router)
     dp.include_router(account_router)
     dp.include_router(stats_router)
+
+    dp.include_router(error_router)
 
     cleanup_task = asyncio.create_task(
         session_states.cleanup_loop()
