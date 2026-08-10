@@ -5,6 +5,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from config import OWNER_ID
 from utils.database import get_user_count
 
 router = Router()
@@ -37,6 +38,15 @@ def format_uptime(seconds: float) -> str:
 
 @router.message(Command("stats"))
 async def stats_handler(message: Message) -> None:
+    if message.from_user is None:
+        return
+
+    if message.from_user.id != OWNER_ID:
+        await message.answer(
+            "❌ You are not authorized to use this command."
+        )
+        return
+
     user_count = get_user_count()
 
     cpu = psutil.cpu_percent(interval=0.2)
