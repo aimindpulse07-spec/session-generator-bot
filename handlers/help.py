@@ -1,6 +1,6 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message
 from aiogram.filters import Command
+from aiogram.types import CallbackQuery, Message
 
 router = Router()
 
