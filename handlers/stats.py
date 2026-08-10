@@ -5,6 +5,8 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from utils.database import get_user_count
+
 router = Router()
 
 START_TIME = time.monotonic()
@@ -35,6 +37,8 @@ def format_uptime(seconds: float) -> str:
 
 @router.message(Command("stats"))
 async def stats_handler(message: Message) -> None:
+    user_count = get_user_count()
+
     cpu = psutil.cpu_percent(interval=0.2)
     memory = psutil.virtual_memory()
 
@@ -44,6 +48,7 @@ async def stats_handler(message: Message) -> None:
 
     text = (
         "📊 <b>Bot Statistics</b>\n\n"
+        f"👥 <b>Users:</b> {user_count}\n"
         f"🖥️ <b>CPU:</b> {cpu:.1f}%\n"
         f"🧠 <b>RAM:</b> {memory.percent:.1f}%\n"
         f"⏱️ <b>Uptime:</b> {uptime}\n"
