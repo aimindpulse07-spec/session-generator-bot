@@ -10,6 +10,7 @@ from handlers.generator import router as generator_router
 from handlers.help import router as help_router
 from handlers.start import router as start_router
 from handlers.stats import router as stats_router
+from middlewares.user_tracking import UserTrackingMiddleware
 from utils.database import init_database
 from utils.errors import router as error_router
 from utils.logger import logger, setup_logging
@@ -33,14 +34,23 @@ async def main() -> None:
 
     dp = Dispatcher()
 
+    # Track users on messages and button callbacks.
+    user_tracking = UserTrackingMiddleware()
+
+    dp.message.middleware(user_tracking)
+    dp.callback_query.middleware(user_tracking)
+
+    # Register bot handlers.
     dp.include_router(start_router)
     dp.include_router(help_router)
     dp.include_router(generator_router)
     dp.include_router(account_router)
     dp.include_router(stats_router)
 
+    # Global error handler.
     dp.include_router(error_router)
 
+    # Remove expired temporary states automatically.
     cleanup_task = asyncio.create_task(
         session_states.cleanup_loop()
     )
