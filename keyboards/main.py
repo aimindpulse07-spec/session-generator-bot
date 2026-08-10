@@ -8,6 +8,12 @@ def main_menu() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
+                    text="🔐 Generate Session",
+                    callback_data="generate",
+                )
+            ],
+            [
+                InlineKeyboardButton(
                     text="📚 Help",
                     callback_data="help",
                 ),
@@ -15,6 +21,6 @@ def main_menu() -> InlineKeyboardMarkup:
                     text="💬 Support",
                     url=SUPPORT_URL,
                 ),
-            ]
+            ],
         ]
     )
