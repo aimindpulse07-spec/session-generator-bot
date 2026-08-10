@@ -22,3 +22,30 @@ def library_menu() -> InlineKeyboardMarkup:
             ],
         ]
     )
+
+
+def auth_method_menu(library: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🔢 OTP",
+                    callback_data=f"auth_otp:{library}",
+                ),
+                InlineKeyboardButton(
+                    text="📷 QR Code",
+                    callback_data=f"auth_qr:{library}",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="⬅️ Back",
+                    callback_data="generate",
+                ),
+                InlineKeyboardButton(
+                    text="✖️ Close",
+                    callback_data="close",
+                ),
+            ],
+        ]
+    )
