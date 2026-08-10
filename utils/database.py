@@ -1,9 +1,16 @@
+import os
 import sqlite3
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data"
+DEFAULT_DATA_DIR = (
+    Path(__file__).resolve().parent.parent / "data"
+)
+
+DATA_DIR = Path(
+    os.getenv("DATA_DIR", str(DEFAULT_DATA_DIR))
+)
+
 DATABASE_PATH = DATA_DIR / "bot.db"
 
 
